@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   OBJLoader.hpp                                      :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: mthiry <mthiry@student.42.fr>              +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/12/29 19:15:40 by mthiry            #+#    #+#             */
-/*   Updated: 2024/12/29 19:15:40 by mthiry           ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #pragma once
 
 // STD Libs
@@ -107,54 +95,54 @@ static std::vector<Vertex> loadOBJ(const std::string& filename)
             ss >> temp_vec3.x >> temp_vec3.y >> temp_vec3.z;
             vertex_normals.push_back(temp_vec3);
         }
-        // else if (prefix == "f")
-        // {
-        //     int counter = 0;
-        //     while (ss >> temp_glint)
-        //     {
-        //         // Pushing indices into correct arrays
-        //         if (counter == 0)
-        //             vertex_position_indicies.push_back(temp_glint);
-        //         else if (counter == 1)
-        //             vertex_texcoord_indicies.push_back(temp_glint);
-        //         else if (counter == 2)
-        //             vertex_normal_indicies.push_back(temp_glint);
+        else if (prefix == "f")
+        {
+            int counter = 0;
+            while (ss >> temp_glint)
+            {
+                // Pushing indices into correct arrays
+                if (counter == 0)
+                    vertex_position_indicies.push_back(temp_glint);
+                else if (counter == 1)
+                    vertex_texcoord_indicies.push_back(temp_glint);
+                else if (counter == 2)
+                    vertex_normal_indicies.push_back(temp_glint);
 
-        //         // Handling characters
-        //         if (ss.peek() == '/')
-        //         {
-        //             ++counter;
-        //             ss.ignore(1, '/');
-        //         }
-        //         else if (ss.peek() == ' ')
-        //         {
-        //             ++counter;
-        //             ss.ignore(1, ' ');
-        //         }
+                // Handling characters
+                if (ss.peek() == '/')
+                {
+                    ++counter;
+                    ss.ignore(1, '/');
+                }
+                else if (ss.peek() == ' ')
+                {
+                    ++counter;
+                    ss.ignore(1, ' ');
+                }
 
-        //         // Reset
-        //         if (counter > 2)
-        //             counter = 0;
-        //     }
-        // }
+                // Reset
+                if (counter > 2)
+                    counter = 0;
+            }
+        }
 
         // Build final vertex array (mesh)
-        // vertices.resize(vertex_position_indicies.size(), Vertex());
+        vertices.resize(vertex_position_indicies.size(), Vertex());
 
         // Load in all indices
-        // for (size_t i = 0; i < vertices.size(); ++i)
-        // {
-        //     vertices[i].position = vertex_positions[vertex_position_indicies[i] - 1];
-        //     vertices[i].texcoord = vertex_texcoords[vertex_texcoord_indicies[i] - 1];
-        //     vertices[i].normal = vertex_normals[vertex_normal_indicies[i] - 1];
-        //     vertices[i].color = glm::vec3(1.f, 1.f, 1.f);
-        // }
+        for (size_t i = 0; i < vertices.size(); ++i)
+        {
+            vertices[i].position = vertex_positions[vertex_position_indicies[i] - 1];
+            vertices[i].texcoord = vertex_texcoords[vertex_texcoord_indicies[i] - 1];
+            vertices[i].normal = vertex_normals[vertex_normal_indicies[i] - 1];
+            vertices[i].color = glm::vec3(1.f, 1.f, 1.f);
+        }
 
         // DEBUG
-        std::cout << line << std::endl;
-        std::cout << "Content of vertex_positions:" << std::endl;
-        printVector(vertex_positions);
-        // std::cout << "Nr of vertices: " << vertices.size() << std::endl;
+        // std::cout << line << std::endl;
+        // std::cout << "Content of vertex_positions:" << std::endl;
+        // printVector(vertex_positions);
+        std::cout << "Nr of vertices: " << vertices.size() << std::endl;
     }
 
     return vertices;

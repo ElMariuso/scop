@@ -27,7 +27,7 @@ void printVector(const std::vector<glm::fvec3>& vec)
 {
     for (const auto& v : vec)
     {
-        std::cout << "x: " << v.x << ", y: " << v.y << ", z: " << v.z << std::endl;
+        std::cout << "x: " << v.x << ", y: " << v.y << ", z: " << v.z << "\n";
     }
 }
 
@@ -37,19 +37,16 @@ static std::vector<Vertex> loadOBJ(const std::string& filename)
     std::vector<glm::fvec2> vertex_texcoords;
     std::vector<glm::fvec3> vertex_normals;
 
-    std::vector<GLint> vertex_position_indicies;
-    std::vector<GLint> vertex_texcoord_indicies;
-    std::vector<GLint> vertex_normal_indicies;
+    std::vector<GLint> vertex_position_indices;
+    std::vector<GLint> vertex_texcoord_indices;
+    std::vector<GLint> vertex_normal_indices;
 
     std::vector<Vertex> vertices;
 
     std::stringstream ss;
     std::ifstream in_file(filename);
 
-    if (!in_file.is_open())
-    {
-        throw "ERROR::OBJLOADER::Could not open file.";
-    }
+    if (!in_file.is_open()) throw std::runtime_error("ERROR::OBJLOADER::Could not open file.");
 
     std::string line = "";
     std::string prefix = "";
@@ -66,21 +63,9 @@ static std::vector<Vertex> loadOBJ(const std::string& filename)
 
         // Ignore comments
         if (prefix == "#")
-            continue ;
+            continue;
 
-        if (prefix == "o")
-        {
-
-        }
-        else if (prefix == "s")
-        {
-
-        }
-        else if (prefix == "usemtl")
-        {
-
-        }
-        else if (prefix == "v")
+        if (prefix == "v")
         {
             ss >> temp_vec3.x >> temp_vec3.y >> temp_vec3.z;
             vertex_positions.push_back(temp_vec3);
@@ -100,15 +85,13 @@ static std::vector<Vertex> loadOBJ(const std::string& filename)
             int counter = 0;
             while (ss >> temp_glint)
             {
-                // Pushing indices into correct arrays
                 if (counter == 0)
-                    vertex_position_indicies.push_back(temp_glint);
+                    vertex_position_indices.push_back(temp_glint);
                 else if (counter == 1)
-                    vertex_texcoord_indicies.push_back(temp_glint);
+                    vertex_texcoord_indices.push_back(temp_glint);
                 else if (counter == 2)
-                    vertex_normal_indicies.push_back(temp_glint);
+                    vertex_normal_indices.push_back(temp_glint);
 
-                // Handling characters
                 if (ss.peek() == '/')
                 {
                     ++counter;
@@ -120,30 +103,40 @@ static std::vector<Vertex> loadOBJ(const std::string& filename)
                     ss.ignore(1, ' ');
                 }
 
-                // Reset
                 if (counter > 2)
                     counter = 0;
             }
         }
-
-        // Build final vertex array (mesh)
-        vertices.resize(vertex_position_indicies.size(), Vertex());
-
-        // Load in all indices
-        for (size_t i = 0; i < vertices.size(); ++i)
-        {
-            vertices[i].position = vertex_positions[vertex_position_indicies[i] - 1];
-            vertices[i].texcoord = vertex_texcoords[vertex_texcoord_indicies[i] - 1];
-            vertices[i].normal = vertex_normals[vertex_normal_indicies[i] - 1];
-            vertices[i].color = glm::vec3(1.f, 1.f, 1.f);
-        }
-
-        // DEBUG
-        // std::cout << line << std::endl;
-        // std::cout << "Content of vertex_positions:" << std::endl;
-        // printVector(vertex_positions);
-        std::cout << "Nr of vertices: " << vertices.size() << std::endl;
     }
 
+    // Build final vertex array (mesh)
+    vertices.resize(vertex_position_indices.size(), Vertex());
+
+    for (size_t i = 0; i < vertex_position_indices.size(); ++i)
+    {
+        if (vertex_position_indices[i] - 1 >= 0 && vertex_position_indices[i] - 1 < vertex_positions.size())
+            vertices[i].position = vertex_positions[vertex_position_indices[i] - 1];
+        else
+            throw std::runtime_error("ERROR::OBJLOADER::Invalid or missing vertex position in OBJ file.");
+
+        if (!vertex_texcoords.empty() && vertex_texcoord_indices[i] - 1 >= 0 && vertex_texcoord_indices[i] - 1 < vertex_texcoords.size())
+            vertices[i].texcoord = vertex_texcoords[vertex_texcoord_indices[i] - 1];
+        else
+            vertices[i].texcoord = glm::vec2(0.0f, 0.0f);
+
+        if (!vertex_normals.empty() && vertex_normal_indices[i] - 1 >= 0 && vertex_normal_indices[i] - 1 < vertex_normals.size())
+            vertices[i].normal = vertex_normals[vertex_normal_indices[i] - 1];
+        else
+            vertices[i].normal = glm::vec3(0.0f, 0.0f, 1.0f);
+
+        vertices[i].color = glm::vec3(1.f, 1.f, 1.f);
+    }
+
+    std::cout << "vertex_positions.size(): " << vertex_positions.size() << "\n";
+    std::cout << "vertex_texcoords.size(): " << vertex_texcoords.size() << "\n";
+    std::cout << "vertex_normals.size(): " << vertex_normals.size() << "\n";
+    std::cout << "vertex_position_indices.size(): " << vertex_position_indices.size() << "\n";
+
+    std::cout << "OBJ file loaded" << "\n";
     return vertices;
 }

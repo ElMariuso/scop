@@ -2,6 +2,6 @@
 
 int main()
 {
-    loadOBJ("models/obj/42.obj");
+    loadOBJ("models/obj/alix.obj");
     return 0;
 }

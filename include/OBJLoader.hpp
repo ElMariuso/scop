@@ -14,22 +14,9 @@
 
 // OpenGL Math Libs
 #include <glm/glm.hpp>
-//#include <vec3.hpp>
-//#include <vec4.hpp>
-//#include <mat4x4.hpp>
-//#include <gtc/matrix_transform.hpp>
-//#include <gtc/type_ptr.hpp>
 
 // Custom Libs
 #include <Vertex.hpp>
-
-void printVector(const std::vector<glm::fvec3>& vec)
-{
-    for (const auto& v : vec)
-    {
-        std::cout << "x: " << v.x << ", y: " << v.y << ", z: " << v.z << "\n";
-    }
-}
 
 static std::vector<Vertex> loadOBJ(const std::string& filename)
 {
